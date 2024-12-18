@@ -1,12 +1,18 @@
 
 import 'package:animate_do/animate_do.dart';
+import 'package:appl_f/main.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../common/input_field.dart';
 import '../../common/primary_button.dart';
 import '../../utils/colors.dart';
-import 'home_screen.dart';
+import '../common/api_helper.dart';
+import '../common/common_toast.dart';
+import '../utils/common_util.dart';
+import '../utils/constants.dart';
+import '../utils/session_helper.dart';
+import 'dashboard/dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  /* Future<void> loginApi() async {
+ Future<void> loginApi() async {
 
     if (usernameController.text.isEmpty) {
       showSnackBar("Enter Username");
@@ -37,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
       closeKeyboard(context);
 
       final response = await ApiHelper.postRequest(
-        url: BaseUrl + getValidateLogin,
+        url: baseUrl + getValidateLogin,
         body: {
           'user_id': usernameController.text,
           'password': passwordController.text,
@@ -58,7 +64,6 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         final data = response;
-
         if(data['status'] == '0') {
           CommonToast.showToast(context: context, title: "Login Failed", description: data['response']['error'].toString(), duration: const Duration(seconds: 10));
         } else {
@@ -83,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }
     }
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -208,13 +213,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     FadeInUp(
                       duration: const Duration(milliseconds: 1200),
                       child: PrimaryButton(
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context){
-                            return const HomeScreen();
-                          }), (r){
-                            return false;
-                          });
-                        },
+                        onPressed: () {  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context){
+                          return const DashboardScreen();
+                        }), (r){
+                          return false;
+                        });} ,//=> loginApi(),
                         context: context,
                         text: "Login",
                         isLoading: isLoading,
@@ -243,10 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
         ));
-
   }
-
-
 
   void showSnackBar(String s) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -254,3 +254,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+

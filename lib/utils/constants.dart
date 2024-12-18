@@ -1,18 +1,9 @@
 
 const getValidateLogin = "getValidateLogin";
-const searchCustomer = "searchCustomer";
+
 const getPTPList = "getPTPList";
 const getPTPListByLan = "getPTPListByLan";
 const savePtpList = "savePtpList";
-const getDueReport = "getDueReport";
-const profileDetails = "ProfileDetails";
-const getUnApprovedCollection = "getUnApprovedCollection";
-
-const getReceiptMode = "getReceiptMode";
-const getBranchList = "getBranchList";
-const deleteCollection = "deleteCollection";
-const getCollectionStatusReport = "getCollectionStatusReport";
-
 
 class SessionKeys {
   static const String userId = "KEY_USER_ID";
