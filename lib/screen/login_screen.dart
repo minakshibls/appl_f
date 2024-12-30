@@ -1,7 +1,6 @@
 
 import 'package:animate_do/animate_do.dart';
 import 'package:appl_f/main.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../common/input_field.dart';
@@ -47,6 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
         body: {
           'user_id': usernameController.text,
           'password': passwordController.text,
+
         },
       );
       if (!mounted) return;
@@ -63,9 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
           description: response['message'],
         );
       } else {
+
         final data = response;
-        if(data['status'] == '0') {
-          CommonToast.showToast(context: context, title: "Login Failed", description: data['response']['error'].toString(), duration: const Duration(seconds: 10));
+        if(data['status'] == 0) {
+          CommonToast.showToast(context: context, title: "Login Failed", description: data['response'].toString(), duration: const Duration(seconds: 10));
         } else {
           var response = data['response'];
           var userdata = response['userdata'];
@@ -213,11 +214,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     FadeInUp(
                       duration: const Duration(milliseconds: 1200),
                       child: PrimaryButton(
-                        onPressed: () {  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context){
-                          return const DashboardScreen();
-                        }), (r){
-                          return false;
-                        });} ,//=> loginApi(),
+                         onPressed: ()
+    //{  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context){
+                        //   return const DashboardScreen();
+                        // }), (r){
+                        //   return false;
+                        // });} ,
+                         => loginApi(),
                         context: context,
                         text: "Login",
                         isLoading: isLoading,
