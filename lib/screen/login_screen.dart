@@ -1,6 +1,6 @@
-
 import 'package:animate_do/animate_do.dart';
 import 'package:appl_f/main.dart';
+import 'package:appl_f/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../common/input_field.dart';
@@ -11,7 +11,6 @@ import '../common/common_toast.dart';
 import '../utils/common_util.dart';
 import '../utils/constants.dart';
 import '../utils/session_helper.dart';
-import 'dashboard/dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,12 +24,10 @@ class _LoginScreenState extends State<LoginScreen> {
   String errorMessage = '';
   var isLoading = false;
 
-
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
- Future<void> loginApi() async {
-
+  Future<void> loginApi() async {
     if (usernameController.text.isEmpty) {
       showSnackBar("Enter Username");
     } else if (passwordController.text.isEmpty) {
@@ -46,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
         body: {
           'user_id': usernameController.text,
           'password': passwordController.text,
-
         },
       );
       if (!mounted) return;
@@ -55,7 +51,6 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = false;
       });
 
-
       if (response['error'] == true) {
         CommonToast.showToast(
           context: context,
@@ -63,27 +58,37 @@ class _LoginScreenState extends State<LoginScreen> {
           description: response['message'],
         );
       } else {
-
         final data = response;
-        if(data['status'] == 0) {
-          CommonToast.showToast(context: context, title: "Login Failed", description: data['response'].toString(), duration: const Duration(seconds: 10));
+        if (data['status'] == 0) {
+          CommonToast.showToast(
+              context: context,
+              title: "Login Failed",
+              description: data['response'].toString(),
+              duration: const Duration(seconds: 10));
         } else {
           var response = data['response'];
           var userdata = response['userdata'];
           var userProfile = response['userprofile'];
 
-          await SessionHelper.saveSessionData(SessionKeys.userId, userProfile['user_id']);
-          await SessionHelper.saveSessionData(SessionKeys.mobile, userProfile['mobile']);
-          await SessionHelper.saveSessionData(SessionKeys.email, userProfile['email']);
-          await SessionHelper.saveSessionData(SessionKeys.gender, userProfile['gender']);
-          await SessionHelper.saveSessionData(SessionKeys.companyId, userProfile['company_id']);
-          await SessionHelper.saveSessionData(SessionKeys.branchList, response['branch_list'].toString());
+          await SessionHelper.saveSessionData(
+              SessionKeys.userId, userProfile['user_id']);
+          await SessionHelper.saveSessionData(
+              SessionKeys.mobile, userProfile['mobile']);
+          await SessionHelper.saveSessionData(
+              SessionKeys.email, userProfile['email']);
+          await SessionHelper.saveSessionData(
+              SessionKeys.gender, userProfile['gender']);
+          await SessionHelper.saveSessionData(
+              SessionKeys.companyId, userProfile['company_id']);
+          await SessionHelper.saveSessionData(
+              SessionKeys.branchList, response['branch_list'].toString());
 
           if (!mounted) return;
 
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context){
-            return const DashboardScreen();
-          }), (r){
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (BuildContext context) {
+            return const HomeScreen();
+          }), (r) {
             return false;
           });
         }
@@ -97,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
       const SystemUiOverlayStyle(
         systemNavigationBarColor: AppColors.textOnPrimary,
         systemNavigationBarIconBrightness:
-        Brightness.light, // Adjust icon brightness
+            Brightness.light, // Adjust icon brightness
       ),
     );
 
@@ -157,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 image: DecorationImage(
                                     opacity: 0.5,
                                     image:
-                                    AssetImage('assets/images/clock.png'))),
+                                        AssetImage('assets/images/clock.png'))),
                           )),
                     ),
                     Positioned(
@@ -168,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Center(
                               child: Padding(
                                 padding:
-                                EdgeInsets.only(top: screenHeight * 0.05),
+                                    EdgeInsets.only(top: screenHeight * 0.05),
                                 child: Container(
                                   width: screenWidth * 0.9,
                                   decoration: const BoxDecoration(
@@ -185,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               Padding(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10),
                 child: Column(
                   children: <Widget>[
                     FadeInUp(
@@ -214,13 +219,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     FadeInUp(
                       duration: const Duration(milliseconds: 1200),
                       child: PrimaryButton(
-                         onPressed: ()
-    //{  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context){
-                        //   return const DashboardScreen();
-                        // }), (r){
-                        //   return false;
-                        // });} ,
-                         => loginApi(),
+                        onPressed: ()
+                        {
+                          Navigator.pushAndRemoveUntil(context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) {
+                            return const HomeScreen();
+                          }), (r) {
+                            return false;
+                          });
+                        },
+                         //=> loginApi(),
                         context: context,
                         text: "Login",
                         isLoading: isLoading,
@@ -229,7 +238,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(
                       height: 40,
                     ),
-
                   ],
                 ),
               ),
@@ -257,4 +265,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

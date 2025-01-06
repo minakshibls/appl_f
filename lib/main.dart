@@ -6,7 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 void main() {
   runApp(const MyApp());
 }
-const baseUrl =  "http://172.17.1.1/1096/api/";
+// const baseUrl =  "http://172.17.1.1/1096/api/";
+// const baseUrl =  "http://uat.bridgelogicsoftware.com/1096/api/";
+const baseUrl =  "https://erp.amarpadma.com/api/";
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

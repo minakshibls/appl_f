@@ -1,6 +1,8 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:appl_f/screen/dashboard/liveness_screen.dart';
 import 'package:appl_f/screen/dashboard/ptp_screen.dart';
+import 'package:appl_f/screen/upload_aadar_screen.dart';
+import 'package:appl_f/screen/upload_pan_screen.dart';
 import 'package:appl_f/screen/webview_screen.dart';
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
@@ -53,9 +55,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             dashboardGreeting(),
             const SizedBox(height: 10),
-            FadeInLeft(
-                duration: const Duration(milliseconds: animationDuration),
-                child: const DashboardLocationBar()),
+            // FadeInLeft(
+            //     duration: const Duration(milliseconds: animationDuration),
+            //     child: const DashboardLocationBar()),
             const SizedBox(height: 10),
             sectionHeader("Today's Snapshot"),
             const SizedBox(height: 20),
@@ -220,12 +222,12 @@ class _DashboardCardState extends State<DashboardCard> {
         children: [
           _buildActionButton(
               Icons.groups, 'Proposal', 'Add a new proposal ', () {
-            const WebViewScreen(url: "https://Dsa.bhorukacapital.com/ajax/route.php?uid=1001&referer=cGlkPTE1MiZhY3Rpb249Y3JlYXRlX3Byb3Bvc2Fs", heading: "Proposal");
+            const WebViewScreen(url: "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTE1MiZhY3Rpb249Y3JlYXRlX3Byb3Bvc2Fs", heading: "Proposal");
 
           }),
           _buildActionButton(
               Icons.group, 'Customer Boarding', 'Add a new Promise', () {
-            const WebViewScreen(url: "https://Dsa.bhorukacapital.com/ajax/route.php?uid=1001&referer=cGlkPTMwMSZhY3Rpb249Y3VzdG9tZXJfYm9hcmRpbmc=", heading: "Customer Boarding");
+            const WebViewScreen(url: "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTMwMSZhY3Rpb249Y3VzdG9tZXJfYm9hcmRpbmc=", heading: "Customer Boarding");
 
           }),
           _buildActionButton(
@@ -237,7 +239,7 @@ class _DashboardCardState extends State<DashboardCard> {
           }),
           _buildActionButton(
               Icons.collections, 'Collection', 'Add a new collection', () {
-            const WebViewScreen(url: "https://Dsa.bhorukacapital.com/ajax/route.php?uid=1001&referer=cGlkPTE2MyZhY3Rpb249ZGlyZWN0X2NvbGxlY3Rpb24=", heading: "Collection");
+            const WebViewScreen(url: "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTE2MyZhY3Rpb249ZGlyZWN0X2NvbGxlY3Rpb24=", heading: "Collection");
 
           }),
           _buildActionButton(
@@ -248,22 +250,73 @@ class _DashboardCardState extends State<DashboardCard> {
           }),
           _buildActionButton(
               Icons.handshake, 'Reconciliation', 'Add a new Promise', () {
-            const WebViewScreen(url: "https://Dsa.bhorukacapital.com/ajax/route.php?uid=1001&referer=cGlkPTMxOCZhY3Rpb249Y29sbGVjdGlvbl9yZWNvbmNpbGlhdGlvbg==", heading: "Reconciliation");
+            const WebViewScreen(url: "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTMxOCZhY3Rpb249Y29sbGVjdGlvbl9yZWNvbmNpbGlhdGlvbg==", heading: "Reconciliation");
 
           }),
           _buildActionButton(
               Icons.sensor_occupied, 'OCR', 'Add a new Promise', () {
-
+            searchBottomSheet(context);
           }),
           _buildActionButton(
               Icons.calculate, 'EMI Calculator', 'Add a new Promise', () {
-            const WebViewScreen(url: "https://Dsa.bhorukacapital.com/ajax/route.php?uid=1001&referer=cGlkPTEwMCZhY3Rpb249bG9hZF9jYWxj", heading: "EMI Calculator");
+            const WebViewScreen(url: "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTEwMCZhY3Rpb249bG9hZF9jYWxj", heading: "EMI Calculator");
 
           }),
         ],
       ),
     );
   }
+  void searchBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: ListTile(
+                  leading: const Icon(Icons.credit_card,color: AppColors.primaryColor,),
+                  title: const Text('Upload Aadhar Card'),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) =>const UploadAadarScreen() ),
+                    );
+                  },
+                ),
+              ),
+              Center(
+                child: ListTile(
+                  leading: const Icon(Icons.account_balance_wallet,color: AppColors.primaryColor,),
+                  title: const Text('Upload Pan Card'),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const UploadPanScreen()),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.red,fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
   Widget _buildActionButton(
       IconData icon, String label, String subTitle, VoidCallback onTap,
