@@ -127,10 +127,13 @@ class _AddPtpScreenState extends State<AddPtpScreen> {
     });
 
     try {
+      var userId = await SessionHelper.getSessionData(SessionKeys.userId);
       final response = await ApiHelper.postRequest(
         url: baseUrl + getPTPListByLan,
         body: {
+          'user_id': userId.toString(),
           'lan': widget.lan,
+          'limit':"50"
         },
       );
 

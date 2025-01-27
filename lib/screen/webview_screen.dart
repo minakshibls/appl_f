@@ -19,8 +19,13 @@ class _WebViewScreenState extends State<WebViewScreen> {
   void initState() {
     super.initState();
 
+    // Set the platform for Android
     WebViewPlatform.instance ??= AndroidWebViewPlatform();
 
+    // If targeting iOS, set the platform for iOS
+    // if (WebViewPlatform.instance == null) {
+    //   WebViewPlatform.instance = WebKitWebView();
+    // }
   }
 
   @override

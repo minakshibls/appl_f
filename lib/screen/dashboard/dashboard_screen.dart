@@ -9,7 +9,6 @@ import '../../utils/colors.dart';
 import '../../utils/constants.dart';
 import '../../utils/loading_widget.dart';
 import '../../utils/session_helper.dart';
-import 'dashboard_location_bar.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

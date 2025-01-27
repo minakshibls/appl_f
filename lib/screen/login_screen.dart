@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:appl_f/main.dart';
 import 'package:appl_f/screen/home_screen.dart';
@@ -45,6 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
           'password': passwordController.text,
         },
       );
+
       if (!mounted) return;
 
       setState(() {
@@ -59,6 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         final data = response;
+// print(data);
         if (data['status'] == 0) {
           CommonToast.showToast(
               context: context,
@@ -68,18 +72,18 @@ class _LoginScreenState extends State<LoginScreen> {
         } else {
           var response = data['response'];
           var userdata = response['userdata'];
-          var userProfile = response['userprofile'];
+          var userprofile = response['userprofile'];
 
           await SessionHelper.saveSessionData(
-              SessionKeys.userId, userProfile['user_id']);
+              SessionKeys.userId, userprofile['user_id']);
           await SessionHelper.saveSessionData(
-              SessionKeys.mobile, userProfile['mobile']);
+              SessionKeys.mobile, userprofile['mobile']);
           await SessionHelper.saveSessionData(
-              SessionKeys.email, userProfile['email']);
+              SessionKeys.email, userprofile['email']);
           await SessionHelper.saveSessionData(
-              SessionKeys.gender, userProfile['gender']);
+              SessionKeys.gender, userprofile['gender']);
           await SessionHelper.saveSessionData(
-              SessionKeys.companyId, userProfile['company_id']);
+              SessionKeys.companyId, userprofile['company_id']);
           await SessionHelper.saveSessionData(
               SessionKeys.branchList, response['branch_list'].toString());
 
@@ -87,14 +91,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
           Navigator.pushAndRemoveUntil(context,
               MaterialPageRoute(builder: (BuildContext context) {
-            return const HomeScreen();
-          }), (r) {
-            return false;
-          });
+                return const HomeScreen();
+              }), (r) {
+                return false;
+              });
         }
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -220,16 +225,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       duration: const Duration(milliseconds: 1200),
                       child: PrimaryButton(
                         onPressed: ()
-                        {
-                          Navigator.pushAndRemoveUntil(context,
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) {
-                            return const HomeScreen();
-                          }), (r) {
-                            return false;
-                          });
-                        },
-                         //=> loginApi(),
+                        // {
+                        //   Navigator.pushAndRemoveUntil(context,
+                        //       MaterialPageRoute(
+                        //           builder: (BuildContext context) {
+                        //     return const HomeScreen();
+                        //   }), (r) {
+                        //     return false;
+                        //   });
+                        // },
+                         => loginApi(),
                         context: context,
                         text: "Login",
                         isLoading: isLoading,

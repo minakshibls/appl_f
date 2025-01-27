@@ -21,7 +21,8 @@ class ApiHelper {
       // print(response.body);
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return jsonDecode(response.body) as Map<String, dynamic>;
+        var res = response.body.toString().replaceAll("ï»¿", "");
+        return jsonDecode(res) as Map<String, dynamic>;
       } else {
         print('Http Error:');
         print(response.body);

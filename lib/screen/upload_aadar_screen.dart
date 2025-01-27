@@ -4,14 +4,16 @@ import 'package:appl_f/common/default_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../common/primary_button.dart';
+
 class UploadAadarScreen extends StatefulWidget {
   const UploadAadarScreen({super.key});
 
   @override
-  State<UploadAadarScreen> createState() => _UploadAadharScreenState();
+  State<UploadAadarScreen> createState() => _UploadAadhaarScreenState();
 }
 
-class _UploadAadharScreenState extends State<UploadAadarScreen> {
+class _UploadAadhaarScreenState extends State<UploadAadarScreen> {
   File? _frontImage;
   File? _backImage;
   final ImagePicker _picker = ImagePicker();
@@ -33,15 +35,14 @@ class _UploadAadharScreenState extends State<UploadAadarScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: DefaultAppBar(title: 'Upload Aadhar Card', size: size),
+      appBar: DefaultAppBar(title: 'Upload Aadhaar Card', size: size),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Front Aadhar Image
             const Text(
-              'Front Aadhar Image',
+              'Front Aadhaar Image',
               style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8.0),
@@ -73,9 +74,8 @@ class _UploadAadharScreenState extends State<UploadAadarScreen> {
             ),
             const SizedBox(height: 16.0),
 
-            // Back Aadhar Image
             const Text(
-              'Back Aadhar Image',
+              'Back Aadhaar Image',
               style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8.0),
@@ -107,10 +107,9 @@ class _UploadAadharScreenState extends State<UploadAadarScreen> {
             ),
             const SizedBox(height: 16.0),
 
-            // Aadhar Number
             const TextField(
               decoration: InputDecoration(
-                labelText: 'Aadhar Number',
+                labelText: 'Aadhaar Number',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
@@ -149,18 +148,7 @@ class _UploadAadharScreenState extends State<UploadAadarScreen> {
             ),
             const SizedBox(height: 24.0),
 
-            // Save Button
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle save action
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 12.0),
-                ),
-                child: const Text('Save', style: TextStyle(fontSize: 18.0)),
-              ),
-            ),
+            PrimaryButton(onPressed:(){} , context: context,text: 'Save',)
           ],
         ),
       ),

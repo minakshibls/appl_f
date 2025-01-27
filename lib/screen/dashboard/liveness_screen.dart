@@ -6,16 +6,16 @@ class LivenessScreen extends StatefulWidget {
   const LivenessScreen({super.key});
 
   @override
-  State<LivenessScreen> createState() => _LivenessScreenState();
+  State<LivenessScreen> createState() => LivenessScreenState();
 }
 
-class _LivenessScreenState extends State<LivenessScreen> {
+class LivenessScreenState extends State<LivenessScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return  Scaffold(
-      backgroundColor: AppColors.textOnPrimary,
       appBar: DefaultAppBar(title: 'Liveness', size: size),
+
     );
   }
 }

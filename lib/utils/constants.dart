@@ -1,9 +1,9 @@
 
 const getValidateLogin = "getValidateLogin";
 
-const getPTPList = "getPTPList";
-const getPTPListByLan = "getPTPListByLan";
-const savePtpList = "savePtpList";
+const getPTPList = "ptpList";
+const getPTPListByLan = "ptpList";
+const savePtpList = "setPtpData";
 
 class SessionKeys {
   static const String userId = "KEY_USER_ID";
