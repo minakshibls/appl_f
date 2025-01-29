@@ -1,8 +1,10 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:appl_f/screen/pin/change_password_screen.dart';
 import 'package:appl_f/screen/pin/change_pin_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/colors.dart';
 import '../../utils/session_helper.dart';
+import '../utils/constants.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -13,13 +15,19 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String userName = 'Minakshi Bisen';
   String image = '';
-  String email = 'minakshi@gamil.com';
-  String mobile = '7694930451';
-  String branch = 'Vijay Nagar, Indore';
+  var email = '';
+  var mobile = '';
+  var branch = '';
   String designation = '';
   String empCode = '';
+  var userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,15 +35,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final List<Map<String, dynamic>> listItems = [
 
-      {
-        "title": "Change Password",
-        "icon": Icons.password_rounded,
-        "onTap": () {
-          // Navigator.of(context).push(
-          //   MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
-          // );
-        },
-      },
+      // {
+      //   "title": "Change Password",
+      //   "icon": Icons.password_rounded,
+      //   "onTap": () {
+      //     Navigator.of(context).push(
+      //       MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
+      //     );
+      //   },
+      // },
       {
         "title": "Change Pin",
         "icon": Icons.pin,
@@ -114,7 +122,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-
+  void getUser() async {
+    var name = await SessionHelper.getSessionData(SessionKeys.username);
+    setState(() {
+      userName = name.toString();
+      email = email.toString();
+      mobile = mobile.toString();
+      branch = branch.toString();
+    });
+  }
   Widget _buildUserDetailCard() {
     var size = MediaQuery.of(context).size;
     return Container(

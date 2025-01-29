@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 
 import 'constants.dart';
 
@@ -26,11 +25,4 @@ void showSnackBar(String s, BuildContext context) {
   );
 }
 
-void shareOnWhatsApp(String message)async {
-  String shareMsg = '$message\n\n${ProjectConfig.blsPoweredBy}';
-  try {
-    await Share.share(shareMsg);
-  } catch (e) {
-    debugPrint('Error: $e');
-  }
-}
+

@@ -1,7 +1,6 @@
 import 'package:appl_f/screen/dashboard/dashboard_screen.dart';
 import 'package:appl_f/screen/profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../utils/colors.dart';
 
 class HomeScreen extends StatefulWidget {
