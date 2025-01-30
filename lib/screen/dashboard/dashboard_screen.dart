@@ -207,6 +207,8 @@ class _DashboardCardState extends State<DashboardCard> {
 
   @override
   Widget build(BuildContext context) {
+    const String baseUrl =
+        "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=";
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: GridView(
@@ -219,15 +221,22 @@ class _DashboardCardState extends State<DashboardCard> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          _buildActionButton(
-              Icons.groups, 'Proposal', 'Add a new proposal ', () {
-            const WebViewScreen(url: "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTE1MiZhY3Rpb249Y3JlYXRlX3Byb3Bvc2Fs", heading: "Proposal");
+          _buildActionButton(Icons.groups, 'Proposal', 'Add a new proposal ',
+              () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const WebViewScreen(
+                    url:
+                        "${baseUrl}cGlkPTMwMSZhY3Rpb249Y3VzdG9tZXJfYm9hcmRpbmc=",
+                    heading: "Proposal")));
 
           }),
           _buildActionButton(
               Icons.group, 'Customer Boarding', 'Add a new Promise', () {
-            const WebViewScreen(url: "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTMwMSZhY3Rpb249Y3VzdG9tZXJfYm9hcmRpbmc=", heading: "Customer Boarding");
-
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const WebViewScreen(
+                    url:
+                        "${baseUrl}cGlkPTMwMSZhY3Rpb249Y3VzdG9tZXJfYm9hcmRpbmc=",
+                    heading: "Customer Boarding")));
           }),
           _buildActionButton(
               Icons.live_tv, 'Liveness', 'Check for unapproved collections',
@@ -238,8 +247,13 @@ class _DashboardCardState extends State<DashboardCard> {
           }),
           _buildActionButton(
               Icons.collections, 'Collection', 'Add a new collection', () {
-            const WebViewScreen(url: "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTE2MyZhY3Rpb249ZGlyZWN0X2NvbGxlY3Rpb24=", heading: "Collection");
-
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (context) => const WebViewScreen(
+                      url:
+                          "${baseUrl}cGlkPTE2MyZhY3Rpb249ZGlyZWN0X2NvbGxlY3Rpb24=",
+                      heading: "Collection")),
+            );
           }),
           _buildActionButton(
               Icons.handshake, 'Promise to pay', 'Add a new Promise', () {
@@ -249,22 +263,30 @@ class _DashboardCardState extends State<DashboardCard> {
           }),
           _buildActionButton(
               Icons.handshake, 'Reconciliation', 'Add a new Promise', () {
-            const WebViewScreen(url: "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTMxOCZhY3Rpb249Y29sbGVjdGlvbl9yZWNvbmNpbGlhdGlvbg==", heading: "Reconciliation");
-
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (context) => const WebViewScreen(
+                      url:
+                          "${baseUrl}cGlkPTMxOCZhY3Rpb249Y29sbGVjdGlvbl9yZWNvbmNpbGlhdGlvbg==",
+                      heading: "Reconciliation")),
+            );
           }),
-          _buildActionButton(
-              Icons.sensor_occupied, 'OCR', 'Add a new Promise', () {
+          _buildActionButton(Icons.sensor_occupied, 'OCR', 'Add a new Promise',
+              () {
             searchBottomSheet(context);
           }),
           _buildActionButton(
               Icons.calculate, 'EMI Calculator', 'Add a new Promise', () {
-            const WebViewScreen(url: "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTEwMCZhY3Rpb249bG9hZF9jYWxj", heading: "EMI Calculator");
-
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const WebViewScreen(
+                    url: "${baseUrl}cGlkPTEwMCZhY3Rpb249bG9hZF9jYWxj",
+                    heading: "EMI Calculator")));
           }),
         ],
       ),
     );
   }
+
   void searchBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -279,22 +301,30 @@ class _DashboardCardState extends State<DashboardCard> {
             children: [
               Center(
                 child: ListTile(
-                  leading: const Icon(Icons.credit_card,color: AppColors.primaryColor,),
+                  leading: const Icon(
+                    Icons.credit_card,
+                    color: AppColors.primaryColor,
+                  ),
                   title: const Text('Upload Aadhar Card'),
                   onTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) =>const UploadAadarScreen() ),
+                      MaterialPageRoute(
+                          builder: (context) => const UploadAadarScreen()),
                     );
                   },
                 ),
               ),
               Center(
                 child: ListTile(
-                  leading: const Icon(Icons.account_balance_wallet,color: AppColors.primaryColor,),
+                  leading: const Icon(
+                    Icons.account_balance_wallet,
+                    color: AppColors.primaryColor,
+                  ),
                   title: const Text('Upload Pan Card'),
                   onTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const UploadPanScreen()),
+                      MaterialPageRoute(
+                          builder: (context) =>  UploadPanScreen()),
                     );
                   },
                 ),
@@ -306,7 +336,7 @@ class _DashboardCardState extends State<DashboardCard> {
                 },
                 child: const Text(
                   'Cancel',
-                  style: TextStyle(color: Colors.red,fontSize: 16),
+                  style: TextStyle(color: Colors.red, fontSize: 16),
                 ),
               ),
             ],
@@ -315,7 +345,6 @@ class _DashboardCardState extends State<DashboardCard> {
       },
     );
   }
-
 
   Widget _buildActionButton(
       IconData icon, String label, String subTitle, VoidCallback onTap,

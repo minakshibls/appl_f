@@ -14,6 +14,7 @@ import '../../utils/colors.dart';
 import '../../utils/constants.dart';
 import '../../utils/loading_widget.dart';
 import '../../utils/session_helper.dart';
+import '../webview_screen.dart';
 import 'add_ptp_screen.dart';
 
 class PTPScreen extends StatefulWidget {
@@ -31,9 +32,10 @@ class PTPScreenState extends State<PTPScreen> {
   @override
   void initState() {
     super.initState();
-    _dateController.text =
+    _ptpListApi();
+    /*_dateController.text =
         DateFormat('dd-MM-yyyy').format(DateTime.timestamp());
-    _dateController.addListener(() => _ptpListApi());
+    _dateController.addListener(() => _ptpListApi());*/
   }
 
   void _ptpListApi() async {
@@ -52,7 +54,7 @@ class PTPScreenState extends State<PTPScreen> {
         body: {
           'user_id': userId.toString(),
           'branch_id': branchId.toString(),
-          'date': _dateController.text.toString(),
+          //'date': _dateController.text.toString(),
         },
       );
 
@@ -116,13 +118,13 @@ class PTPScreenState extends State<PTPScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
+            const Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5),
+              EdgeInsets.symmetric(horizontal: 16.0, vertical: 5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "Promises For ",
                     style: TextStyle(
                       color: AppColors.titleColor,
@@ -130,11 +132,11 @@ class PTPScreenState extends State<PTPScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 15),
+                 /* const SizedBox(height: 15),
                   DatePickerField(
                     controller: _dateController,
-                  ),
-                  const SizedBox(height: 5),
+                  ),*/
+                  SizedBox(height: 5),
                 ],
               ),
             ),
@@ -360,8 +362,13 @@ class _CollectionItemCardState extends State<CollectionItemCard> {
                   _buildActionButton(
                       Icons.account_balance_wallet, 'Collection', Colors.green,
                           () {
-                          //  const WebViewScreen(url: "https://Dsa.bhorukacapital.com/ajax/route.php?uid=1001&referer=pid=163&action=direct_collection&lan=", heading: "Collection");
-                      }),
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) => const WebViewScreen(
+                                      url:
+                                      "https://erp.amarpadma.com/ajax/route.php?uid=1001&referer=cGlkPTE2MyZhY3Rpb249ZGlyZWN0X2NvbGxlY3Rpb24=",
+                                      heading: "Collection")),
+                            );                      }),
                   Container(
                     color: AppColors.textColor,
                     width: .5,

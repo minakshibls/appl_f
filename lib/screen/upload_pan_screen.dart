@@ -1,122 +1,170 @@
 import 'dart:io';
-
-import 'package:appl_f/common/default_app_bar.dart';
-import 'package:appl_f/common/primary_button.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../common/primary_button.dart';
 
 class UploadPanScreen extends StatefulWidget {
   const UploadPanScreen({super.key});
 
   @override
-  State<UploadPanScreen> createState() => _UploadPanScreenState();
+  UploadPanScreenState createState() => UploadPanScreenState();
 }
 
-class _UploadPanScreenState extends State<UploadPanScreen> {
-  File? _frontImage;
+class UploadPanScreenState extends State<UploadPanScreen> {
   final ImagePicker _picker = ImagePicker();
+  File? _panImage;
+  String? _panNumber;
+  String? _dob;
+
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _panController = TextEditingController();
-  final TextEditingController _customerNameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
 
-  Future<void> _pickImage(bool isFront) async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
-        if (isFront)
-        {
-          _frontImage = File(pickedFile.path);
-          // Example data for demonstration
-          _panController.text = "ABCDE1234F";
-          _customerNameController.text = "John Doe";
-          _dobController.text = "01/01/1990";
-        }
+        _panImage = File(pickedFile.path);
       });
+      _processImage(_panImage!);
     }
   }
 
+  Future<void> _processImage(File image) async {
+    if (!image.existsSync()) {
+      print("Error: Image file does not exist.");
+      return;
+    }
+
+    final inputImage = InputImage.fromFile(image);
+    final textRecognizer = TextRecognizer();
+
+    try {
+      final RecognizedText recognizedText =
+          await textRecognizer.processImage(inputImage);
+
+      String? panNumber;
+      String? dob;
+
+      List<String> lines = recognizedText.text.split('\n');
+
+      for (String text in lines) {
+        text = text.trim();
+
+        if (RegExp(r'^[A-Za-z]{5}[0-9]{4}[A-Za-z]$').hasMatch(text)) {
+          panNumber = text;
+        } else if (RegExp(
+                r'\b(0[1-9]|[12][0-9]|3[01])[-/](0[1-9]|1[0-2])[-/](19|20)\d\d\b')
+            .hasMatch(text)) {
+          dob = text;
+        } else if (text.length > 3 &&
+            text.length < 25 &&
+            !text.contains(RegExp(r'[0-9]'))) {
+          // Name should be between 3-25 characters and should not contain numbers
+        }
+      }
+
+      if (panNumber != null || dob != null) {
+        setState(() {
+          if (panNumber != null) {
+            _panNumber = panNumber;
+            _panController.text = _panNumber!;
+          }
+          if (dob != null) {
+            _dob = dob;
+            _dobController.text = _dob!;
+          }
+        });
+      }
+    } catch (e) {
+      print("Error processing image: $e");
+    } finally {
+      textRecognizer.close();
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: DefaultAppBar(title: 'Upload Pan', size: size),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'PAN Image',
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8.0),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 120.0,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: _frontImage != null
-                        ? Image.file(
-                      _frontImage!,
-                      fit: BoxFit.cover,
-                    )
-                        : const Center(
-                      child: Icon(Icons.image, size: 50.0, color: Colors.grey),
-                    ),
+      appBar: AppBar(title: const Text('Upload PAN Card')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _panImage != null
+                      ? Image.file(_panImage!, height: 200, width: 200)
+                      : Container(
+                          height: 200.0,
+                          width: 250,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: const Center(
+                            child: Icon(Icons.image,
+                                size: 50.0, color: Colors.grey),
+                          ),
+                        ),
+                  Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _pickImage(ImageSource.gallery),
+                        child: const Text('Gallery',
+                            style: TextStyle(fontSize: 15)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _pickImage(ImageSource.camera),
+                        child: const Text('Camera',
+                            style: TextStyle(fontSize: 15)),
+                      ),
+                    ],
                   ),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(width: 16.0),
-                ElevatedButton(
-                  onPressed: () => _pickImage(true), // Pick front image
-                  child: const Text('Choose File'),
+                // Non-editable
+              ),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _panController,
+                decoration: const InputDecoration(
+                  labelText: 'PAN Number',
+                  border: OutlineInputBorder(),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-
-            TextField(
-              controller: _panController,
-              decoration: const InputDecoration(
-                labelText: 'PAN Number',
-                border: OutlineInputBorder(),
+                readOnly: true, // Non-editable
               ),
-              enabled: false, // Non-editable
-            ),
-            const SizedBox(height: 16.0),
-
-            TextField(
-              controller: _customerNameController,
-              decoration: const InputDecoration(
-                labelText: 'Customer Name',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _dobController,
+                decoration: const InputDecoration(
+                  labelText: 'Date of Birth',
+                  border: OutlineInputBorder(),
+                ),
+                readOnly: true, // Non-editable
               ),
-              enabled: false, // Non-editable
-            ),
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: _dobController,
-              decoration: const InputDecoration(
-                labelText: 'Date of Birth',
-                border: OutlineInputBorder(),
-                suffixIcon: Icon(Icons.calendar_today),
+              const SizedBox(height: 16.0),
+              PrimaryButton(
+                onPressed: (){},
+                context: context,
+                text: 'Submit',
               ),
-              enabled: false, // Non-editable
-            ),
-
-            const SizedBox(height: 24.0),
-
-            PrimaryButton(
-              onPressed: () {
-                // Handle save action
-              },
-              context: context,
-              text: 'Save',
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );

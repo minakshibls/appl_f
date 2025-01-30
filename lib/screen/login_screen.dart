@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         final data = response;
-// print(data);
+ print(data);
         if (data['status'] == 0) {
           CommonToast.showToast(
               context: context,
@@ -77,9 +77,9 @@ class _LoginScreenState extends State<LoginScreen> {
           await SessionHelper.saveSessionData(
               SessionKeys.userId, userprofile['user_id']);
           await SessionHelper.saveSessionData(
-              SessionKeys.mobile, userprofile['mobile']);
+              SessionKeys.mobile, userdata['mobile']);
           await SessionHelper.saveSessionData(
-              SessionKeys.email, userprofile['email']);
+              SessionKeys.email, userdata['email']);
           await SessionHelper.saveSessionData(
               SessionKeys.gender, userprofile['gender']);
           await SessionHelper.saveSessionData(

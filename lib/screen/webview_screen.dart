@@ -34,20 +34,25 @@ class _WebViewScreenState extends State<WebViewScreen> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
+          onHttpAuthRequest: (request) {
+
+            print("request");
+            print(request);
+          },
           onProgress: (int progress) {},
           onPageStarted: (String url) {},
           onPageFinished: (String url) {},
           onHttpError: (HttpResponseError error) {
-
           },
-          onWebResourceError: (WebResourceError error) {},
+          onWebResourceError: (WebResourceError error) {
+          },
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.startsWith('https://www.youtube.com/')) {
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;
           },
-        ),
+        )
       )
       ..loadRequest(Uri.parse(widget.url));
 
@@ -56,7 +61,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
         backgroundColor: AppColors.primaryColor,
         title: Text(
           widget.heading,
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: WebViewWidget(controller: controller),

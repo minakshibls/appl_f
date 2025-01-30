@@ -1,5 +1,4 @@
 import 'package:animate_do/animate_do.dart';
-import 'package:appl_f/screen/pin/change_password_screen.dart';
 import 'package:appl_f/screen/pin/change_pin_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/colors.dart';
@@ -16,9 +15,9 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String image = '';
-  var email = '';
-  var mobile = '';
-  var branch = '';
+  var emailId = '';
+  var mobileNo = '';
+  var branchId = '';
   String designation = '';
   String empCode = '';
   var userName = '';
@@ -124,11 +123,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
   void getUser() async {
     var name = await SessionHelper.getSessionData(SessionKeys.username);
+    var email = await SessionHelper.getSessionData(SessionKeys.email);
+    var mobile = await SessionHelper.getSessionData(SessionKeys.mobile);
+    var branch = await SessionHelper.getSessionData(SessionKeys.branchId);
     setState(() {
       userName = name.toString();
-      email = email.toString();
-      mobile = mobile.toString();
-      branch = branch.toString();
+      emailId = email.toString();
+      mobileNo = mobile.toString();
+      branchId = branch.toString();
     });
   }
   Widget _buildUserDetailCard() {
@@ -163,7 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Icon(Icons.mail, color: Colors.white, size: 16),
                     const SizedBox(width: 5),
                     Text(
-                      email,
+                      emailId,
                       style: const TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ],
@@ -175,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Icon(Icons.phone, color: Colors.white, size: 16),
                     const SizedBox(width: 5),
                     Text(
-                      mobile,
+                      mobileNo,
                       style: const TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ],

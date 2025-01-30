@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:appl_f/common/default_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../common/primary_button.dart';
@@ -10,25 +11,54 @@ class UploadAadarScreen extends StatefulWidget {
   const UploadAadarScreen({super.key});
 
   @override
-  State<UploadAadarScreen> createState() => _UploadAadhaarScreenState();
+  State<UploadAadarScreen> createState() => UploadAadhaarScreenState();
 }
 
-class _UploadAadhaarScreenState extends State<UploadAadarScreen> {
-  File? _frontImage;
-  File? _backImage;
-  final ImagePicker _picker = ImagePicker();
+class UploadAadhaarScreenState extends State<UploadAadarScreen> {
+  File? _aadharFrontImage;
+  File? _aadharBackImage;
+  String? _name;
+  String? _dob;
+  String? _aadharNumber;
+  String? _address;
+  final picker = ImagePicker();
 
   Future<void> _pickImage(bool isFront) async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         if (isFront) {
-          _frontImage = File(pickedFile.path);
+          _aadharFrontImage = File(pickedFile.path);
+          _processImage(_aadharFrontImage!, isFront);
         } else {
-          _backImage = File(pickedFile.path);
+          _aadharBackImage = File(pickedFile.path);
+          _processImage(_aadharBackImage!, isFront);
         }
       });
     }
+  }
+
+  Future<void> _processImage(File image, bool isFront) async {
+    final inputImage = InputImage.fromFile(image);
+    final textRecognizer = TextRecognizer();
+    final RecognizedText recognizedText =
+    await textRecognizer.processImage(inputImage);
+
+    for (TextBlock block in recognizedText.blocks) {
+      for (TextLine line in block.lines) {
+        String text = line.text;
+        if (RegExp(r"^\\d{4}\\s\\d{4}\\s\\d{4}$").hasMatch(text)) {
+          setState(() => _aadharNumber = text.replaceAll(' ', ''));
+        } else if (RegExp(r'\d{2}/\d{2}/\d{4}').hasMatch(text)) {
+          setState(() => _dob = text);
+        } else if (text.contains("Government of India")) {
+          setState(() => _name = block.lines[1].text);
+        } else {
+          setState(() => _address = text);
+        }
+      }
+    }
+    textRecognizer.close();
   }
 
   @override
@@ -55,9 +85,9 @@ class _UploadAadhaarScreenState extends State<UploadAadarScreen> {
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: _frontImage != null
+                    child: _aadharFrontImage != null
                         ? Image.file(
-                      _frontImage!,
+                      _aadharFrontImage!,
                       fit: BoxFit.cover,
                     )
                         : const Center(
@@ -88,9 +118,9 @@ class _UploadAadhaarScreenState extends State<UploadAadarScreen> {
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: _backImage != null
+                    child: _aadharBackImage != null
                         ? Image.file(
-                      _backImage!,
+                      _aadharBackImage!,
                       fit: BoxFit.cover,
                     )
                         : const Center(
@@ -107,48 +137,50 @@ class _UploadAadhaarScreenState extends State<UploadAadarScreen> {
             ),
             const SizedBox(height: 16.0),
 
-            const TextField(
-              decoration: InputDecoration(
+            // Aadhaar Number (Non-editable)
+            TextField(
+              controller: TextEditingController(text: _aadharNumber),
+              decoration: const InputDecoration(
                 labelText: 'Aadhaar Number',
                 border: OutlineInputBorder(),
               ),
-              keyboardType: TextInputType.number,
+              enabled: false,
             ),
             const SizedBox(height: 16.0),
 
-            // Customer Name
-            const TextField(
-              decoration: InputDecoration(
+            // Customer Name (Non-editable)
+            TextField(
+              controller: TextEditingController(text: _name),
+              decoration: const InputDecoration(
                 labelText: 'Customer Name',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16.0),
 
-            // Date of Birth
+            // Date of Birth (Non-editable)
             TextField(
+              controller: TextEditingController(text: _dob),
               decoration: const InputDecoration(
                 labelText: 'Date of Birth',
                 border: OutlineInputBorder(),
-                suffixIcon: Icon(Icons.calendar_today),
               ),
-              readOnly: true,
-              onTap: () {
-                // Handle date picker
-              },
+              enabled: false,
             ),
             const SizedBox(height: 16.0),
 
-            // Address
-            const TextField(
-              decoration: InputDecoration(
+            // Address (Non-editable)
+            TextField(
+              controller: TextEditingController(text: _address),
+              decoration: const InputDecoration(
                 labelText: 'Address',
                 border: OutlineInputBorder(),
               ),
+              enabled: false,
             ),
             const SizedBox(height: 24.0),
 
-            PrimaryButton(onPressed:(){} , context: context,text: 'Save',)
+            PrimaryButton(onPressed: () {}, context: context, text: 'Save'),
           ],
         ),
       ),

@@ -12,7 +12,7 @@ class SessionKeys {
   static const String branchList = "KEY_BRANCH_LIST";
   static const String gender = "KEY_GENDER";
   static const String mobile = "KEY_MOBILE";
-  static const String email = "KEY_MOBILE";
+  static const String email = "KEY_EMAIL";
   static const String companyId = "KEY_COMPANY_ID";
   static const String designation = "KEY_DESIGNATION";
   static const String employeeCode = "KEY_EMPLOYEE_CODE";

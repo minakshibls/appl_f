@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'constants.dart';
-
 String getFancyNumber(double number) {
   // Split into integer and decimal parts
   String numberString = number.toStringAsFixed(2);
