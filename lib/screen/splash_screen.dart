@@ -1,4 +1,4 @@
-
+import 'package:appl_f/screen/pin/check_pin_screen.dart';
 import 'package:flutter/material.dart';
 import '../../utils/constants.dart';
 import '../../utils/session_helper.dart';
@@ -25,7 +25,7 @@ class SplashScreenState extends State<SplashScreen> {
 
     if (userId != null) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        MaterialPageRoute(builder: (context) => const CheckPinScreen()),
       );
     } else {
       await Future.delayed(const Duration(seconds: 1), () {});

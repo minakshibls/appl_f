@@ -1,187 +1,280 @@
 import 'dart:io';
-
 import 'package:appl_f/common/default_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../common/api_helper.dart';
+import '../common/common_toast.dart';
 import '../common/primary_button.dart';
+import '../common/success_dialog.dart';
+import '../main.dart';
+import '../utils/common_util.dart';
+import '../utils/constants.dart';
+import '../utils/session_helper.dart';
 
-class UploadAadarScreen extends StatefulWidget {
-  const UploadAadarScreen({super.key});
+class UploadAadhaarScreen extends StatefulWidget {
+  const UploadAadhaarScreen({super.key});
 
   @override
-  State<UploadAadarScreen> createState() => UploadAadhaarScreenState();
+  UploadAadhaarScreenState createState() => UploadAadhaarScreenState();
 }
 
-class UploadAadhaarScreenState extends State<UploadAadarScreen> {
-  File? _aadharFrontImage;
-  File? _aadharBackImage;
-  String? _name;
-  String? _dob;
-  String? _aadharNumber;
+class UploadAadhaarScreenState extends State<UploadAadhaarScreen> {
+  final ImagePicker _picker = ImagePicker();
+  File? _aadhaarFrontImage;
+  File? _aadhaarBackImage;
+  String? _aadhaarNumber;
   String? _address;
-  final picker = ImagePicker();
+  String? _dob;
+  var isLoading = false;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _aadhaarController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
 
-  Future<void> _pickImage(bool isFront) async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  get type => 'aadhar';
+
+  void dispose() {
+    _aadhaarController.dispose();
+    _dobController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> submitAadharApi() async {
+    if (_nameController.text.isEmpty) {
+      // showSnackBar("Enter Username");
+    } else if (_aadhaarController.text.isEmpty) {
+    }
+    else if (_dobController.text.isEmpty) {
+      // showSnackBar("Enter Date Of Birth");
+    } else {
+      setState(() {
+        isLoading = true;
+      });
+      closeKeyboard(context);
+      var userId = await SessionHelper.getSessionData(SessionKeys.userId);
+
+      final response = await ApiHelper.postRequest(
+        url: baseUrl + submitAadhar,
+        body: {
+          'user_id':userId ,
+          'validation_type': type,
+          'validation_no': _aadhaarController.text,
+          'customer_name': _nameController.text,
+          'dob': _dobController.text,
+          'address': _addressController.text,
+          'document_string': _aadhaarFrontImage.toString(),
+          'document_string2': _aadhaarBackImage.toString(),
+        },
+      );
+
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+      });
+
+      if (response['error'] == true) {
+        CommonToast.showToast(
+          context: context,
+          title: "Aadhar Upload Failed",
+          description: response['message'],
+        );
+      } else {
+        final data = response;
+        print(data);
+        if (data['status'] == 0) {
+          CommonToast.showToast(
+              context: context,
+              title: "Aadhar Upload Failed",
+              description: data['response'].toString(),
+              duration: const Duration(seconds: 10));
+        } else {
+          showSuccessDialog(context, "Submit Aadhar", duration: 5, onDismiss: () {
+            Navigator.of(context).pop();
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> _pickImage(ImageSource source, {required bool isFront}) async {
+    final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
         if (isFront) {
-          _aadharFrontImage = File(pickedFile.path);
-          _processImage(_aadharFrontImage!, isFront);
+          _aadhaarFrontImage = File(pickedFile.path);
+          _processImage(_aadhaarFrontImage!);
         } else {
-          _aadharBackImage = File(pickedFile.path);
-          _processImage(_aadharBackImage!, isFront);
+          _aadhaarBackImage = File(pickedFile.path);
+          _processImage(_aadhaarBackImage!);
         }
       });
     }
   }
 
-  Future<void> _processImage(File image, bool isFront) async {
+  Future<void> _processImage(File image) async {
+    if (!image.existsSync()) {
+      print("Error: Image file does not exist.");
+      return;
+    }
+
     final inputImage = InputImage.fromFile(image);
     final textRecognizer = TextRecognizer();
-    final RecognizedText recognizedText =
-    await textRecognizer.processImage(inputImage);
 
-    for (TextBlock block in recognizedText.blocks) {
-      for (TextLine line in block.lines) {
-        String text = line.text;
-        if (RegExp(r"^\\d{4}\\s\\d{4}\\s\\d{4}$").hasMatch(text)) {
-          setState(() => _aadharNumber = text.replaceAll(' ', ''));
-        } else if (RegExp(r'\d{2}/\d{2}/\d{4}').hasMatch(text)) {
-          setState(() => _dob = text);
-        } else if (text.contains("Government of India")) {
-          setState(() => _name = block.lines[1].text);
-        } else {
-          setState(() => _address = text);
+    try {
+      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+      List<String> lines = recognizedText.text.split('\n');
+
+      for (String text in lines) {
+        text = text.trim();
+
+        if (RegExp(r'^\d{4}\s\d{4}\s\d{4}$').hasMatch(text)) {
+          setState(() {
+            _aadhaarNumber = text;
+            _aadhaarController.text = _aadhaarNumber!;
+          });
+        } else if (RegExp(r'\b(0[1-9]|[12][0-9]|3[01])[-/](0[1-9]|1[0-2])[-/](19|20)\d\d\b').hasMatch(text)) {
+          setState(() {
+            _dob = text;
+            _dobController.text = _dob!;
+          });
+        } else if (text.length > 10) {
+          setState(() {
+            _address = text;
+            _addressController.text = _address!;
+          });
         }
       }
+    } catch (e) {
+      print("Error processing image: $e");
+    } finally {
+      textRecognizer.close();
     }
-    textRecognizer.close();
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
+    var size  = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: DefaultAppBar(title: 'Upload Aadhaar Card', size: size),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Front Aadhaar Image',
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8.0),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 120.0,
+      appBar: DefaultAppBar(title: 'Upload Aadhar Card', size: size),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _aadhaarFrontImage != null
+                      ? Image.file(_aadhaarFrontImage!, height: 130, width: 200)
+                      : Container(
+                    height: 150.0,
+                    width: 250,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: _aadharFrontImage != null
-                        ? Image.file(
-                      _aadharFrontImage!,
-                      fit: BoxFit.cover,
-                    )
-                        : const Center(
-                      child: Icon(Icons.image, size: 50.0, color: Colors.grey),
+                    child: const Center(
+                      child: Icon(Icons.image,
+                          size: 50.0, color: Colors.grey),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16.0),
-                ElevatedButton(
-                  onPressed: () => _pickImage(true), // Pick front image
-                  child: const Text('Choose File'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16.0),
+                  Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _pickImage(ImageSource.gallery, isFront: true),
+                        child: const Text('Gallery'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _pickImage(ImageSource.camera, isFront: true),
+                        child: const Text('Camera'),
+                      ),
 
-            const Text(
-              'Back Aadhaar Image',
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8.0),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 120.0,
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _aadhaarBackImage != null
+                      ? Image.file(_aadhaarBackImage!, height: 130, width: 200)
+                      : Container(
+                    height: 150.0,
+                    width: 250,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: _aadharBackImage != null
-                        ? Image.file(
-                      _aadharBackImage!,
-                      fit: BoxFit.cover,
-                    )
-                        : const Center(
-                      child: Icon(Icons.image, size: 50.0, color: Colors.grey),
+                    child: const Center(
+                      child: Icon(Icons.image,
+                          size: 50.0, color: Colors.grey),
                     ),
                   ),
+                  Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _pickImage(ImageSource.gallery, isFront: false),
+                        child: const Text('Gallery'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _pickImage(ImageSource.camera, isFront: false),
+                        child: const Text('Camera'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(width: 16.0),
-                ElevatedButton(
-                  onPressed: () => _pickImage(false), // Pick back image
-                  child: const Text('Choose File'),
+                // Non-editable
+              ),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _aadhaarController,
+                decoration: const InputDecoration(
+                  labelText: 'Aadhar Number',
+                  border: OutlineInputBorder(),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-
-            // Aadhaar Number (Non-editable)
-            TextField(
-              controller: TextEditingController(text: _aadharNumber),
-              decoration: const InputDecoration(
-                labelText: 'Aadhaar Number',
-                border: OutlineInputBorder(),
+                readOnly: true, // Non-editable
               ),
-              enabled: false,
-            ),
-            const SizedBox(height: 16.0),
-
-            // Customer Name (Non-editable)
-            TextField(
-              controller: TextEditingController(text: _name),
-              decoration: const InputDecoration(
-                labelText: 'Customer Name',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _dobController,
+                decoration: const InputDecoration(
+                  labelText: 'Date of Birth',
+                  border: OutlineInputBorder(),
+                ), // Non-editable
               ),
-            ),
-            const SizedBox(height: 16.0),
-
-            // Date of Birth (Non-editable)
-            TextField(
-              controller: TextEditingController(text: _dob),
-              decoration: const InputDecoration(
-                labelText: 'Date of Birth',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _addressController,
+                decoration: const InputDecoration(
+                  labelText: 'Address',
+                  border: OutlineInputBorder(),
+                ),
+                 // Non-editable
               ),
-              enabled: false,
-            ),
-            const SizedBox(height: 16.0),
-
-            // Address (Non-editable)
-            TextField(
-              controller: TextEditingController(text: _address),
-              decoration: const InputDecoration(
-                labelText: 'Address',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 16.0),
+              PrimaryButton(
+                onPressed: (){submitAadharApi();},
+                context: context,
+                text: 'Submit',
               ),
-              enabled: false,
-            ),
-            const SizedBox(height: 24.0),
-
-            PrimaryButton(onPressed: () {}, context: context, text: 'Save'),
-          ],
+            ],
+          ),
         ),
       ),
     );

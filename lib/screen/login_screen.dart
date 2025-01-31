@@ -1,8 +1,7 @@
-import 'dart:convert';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:appl_f/main.dart';
-import 'package:appl_f/screen/home_screen.dart';
+import 'package:appl_f/screen/pin/set_pin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../common/input_field.dart';
@@ -62,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         final data = response;
- print(data);
+ //print(data);
         if (data['status'] == 0) {
           CommonToast.showToast(
               context: context,
@@ -88,13 +87,10 @@ class _LoginScreenState extends State<LoginScreen> {
               SessionKeys.branchList, response['branch_list'].toString());
 
           if (!mounted) return;
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const SetPinScreen()),
+          );
 
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (BuildContext context) {
-                return const HomeScreen();
-              }), (r) {
-                return false;
-              });
         }
       }
     }

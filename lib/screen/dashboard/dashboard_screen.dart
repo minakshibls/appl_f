@@ -38,15 +38,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           "Dashboard",
           style: TextStyle(color: AppColors.textOnPrimary),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none,
-                color: AppColors.textOnPrimary),
-            onPressed: () {
-              // Navigate to notification screen
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -55,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             dashboardGreeting(),
             const SizedBox(height: 10),
             // FadeInLeft(
-            //     duration: const Duration(milliseconds: animationDuration),
+              //duration: const Duration(milliseconds: animationDuration),
             //     child: const DashboardLocationBar()),
             const SizedBox(height: 10),
             sectionHeader("Today's Snapshot"),
@@ -309,7 +300,7 @@ class _DashboardCardState extends State<DashboardCard> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (context) => const UploadAadarScreen()),
+                          builder: (context) => const UploadAadhaarScreen()),
                     );
                   },
                 ),

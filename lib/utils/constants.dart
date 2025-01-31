@@ -4,6 +4,8 @@ const getValidateLogin = "getValidateLogin";
 const getPTPList = "ptpList";
 const getPTPListByLan = "ptpList";
 const savePtpList = "setPtpData";
+const submitPan = "oceSubmit";
+const submitAadhar = "oceSubmit";
 
 class SessionKeys {
   static const String userId = "KEY_USER_ID";
