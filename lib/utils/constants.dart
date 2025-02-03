@@ -6,6 +6,7 @@ const getPTPListByLan = "ptpList";
 const savePtpList = "setPtpData";
 const submitPan = "oceSubmit";
 const submitAadhar = "oceSubmit";
+const getLiveNess = "getLiveNess";
 
 class SessionKeys {
   static const String userId = "KEY_USER_ID";

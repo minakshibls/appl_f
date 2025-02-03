@@ -1,11 +1,14 @@
-import 'dart:math';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:appl_f/common/default_app_bar.dart';
 import 'package:appl_f/utils/colors.dart';
 import 'package:flutter/material.dart';
 
+import '../../common/api_helper.dart';
+import '../../common/common_toast.dart';
+import '../../main.dart';
+import '../../utils/constants.dart';
 import '../../utils/loading_widget.dart';
+import '../../utils/session_helper.dart';
 
 class LivenessScreen extends StatefulWidget {
   const LivenessScreen({super.key});
@@ -15,17 +18,70 @@ class LivenessScreen extends StatefulWidget {
 }
 
 class LivenessScreenState extends State<LivenessScreen> {
-  var isLoading = false;
-  List<String> livenessItems = [
-    'Pramod Kumar Matho',
-    'Minakshi Bisen',
-  ];
+  bool isLoading = false;
+  var isListLoading = false;
+  List<dynamic> livenessItems = [];
 
+  void ptpListApi() async {
+    setState(() {
+      isListLoading = true;
+    });
+
+    try {
+      var userId = await SessionHelper.getSessionData(SessionKeys.userId);
+      final response = await ApiHelper.postRequest(
+        url: baseUrl + getLiveNess,
+        body: {
+          'user_id': userId.toString(),
+        },
+      );
+
+      if (!mounted) return;
+
+      if (response['error'] == 0) {
+        CommonToast.showToast(
+          context: context,
+          title: "Request Failed",
+          description: response['message'] ?? "Unknown error occurred",
+        );
+        setState(() {
+          livenessItems = [];
+          isListLoading = false;
+        });
+        return;
+      }
+      final data = response;
+
+      setState(() {
+        livenessItems = data['response'] ?? [];
+        isListLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      CommonToast.showToast(
+        context: context,
+        title: "Error",
+        description: "An unexpected error occurred: ${e.toString()}",
+      );
+
+      setState(() {
+        livenessItems = [];
+        isListLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ptpListApi();
+  }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return  Scaffold(
+    return Scaffold(
       appBar: DefaultAppBar(title: 'Liveness', size: size),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -33,8 +89,7 @@ class LivenessScreenState extends State<LivenessScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
-              padding:
-              EdgeInsets.symmetric(horizontal: 16.0, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -53,45 +108,48 @@ class LivenessScreenState extends State<LivenessScreen> {
             isLoading
                 ? const SizedBox(height: 200, child: LoadingWidget(size: 40))
                 : Expanded(
-              child: /*livenessItems.isEmpty
-                  ? Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/images/ic_empty.png',
-                        width: 50, height: 50),
-                    const Text(
-                      "No PTP found",
-                      style: TextStyle(
-                          color: AppColors.titleLightColor),
-                    ),
-                  ],
-                ),
-              )*/
-                   ListView.builder(
-                itemCount: livenessItems.length,
-                itemBuilder: (context, index) {
-                  var item = livenessItems[index];
-                  return FadeInLeft(
-                    delay: Duration(
-                        milliseconds: min(index * 180, 1000)),
-                    child: LivenessItemCard(
-                      name: livenessItems[index] ?? 'Unknown',
-                      status: 'Active',
-                      mobile: '09876544231',
-                      onTap: () {
-                        // Handle item tap if needed
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
+                    child: livenessItems.isEmpty
+                        ? Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset('assets/images/ic_empty.png',
+                                    width: 50, height: 50),
+                                const Text(
+                                  "No PTP found",
+                                  style: TextStyle(
+                                      color: AppColors.titleLightColor),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Column(
+                            children:
+                                livenessItems.asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final item = entry.value;
+                              if (item == null) return const SizedBox();
+                              return FadeInLeft(
+                                delay: Duration(milliseconds: index * 160),
+                                child: LivenessItemCard(
+                                  name: item['customer_name']?.toString() ??
+                                      "N/A",
+                                  status:
+                                      item['applicant_status']?.toString() ??
+                                          "N/A",
+                                  mobile:
+                                      item['mobile_no']?.toString() ?? "N/A",
+                                  onTap: () {
+                                    // Handle item tap if needed
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                          )),
           ],
         ),
       ),
-
     );
   }
 }
@@ -219,8 +277,7 @@ class _LivenessItemCardState extends State<LivenessItemCard> {
                     padding: const EdgeInsets.symmetric(vertical: 5),
                   ),
                   _buildActionButton(
-                      Icons.phone, 'Start Video', Colors.orange, () {
-                  }),
+                      Icons.phone, 'Start Video', Colors.orange, () {}),
                 ],
               ),
             ),
@@ -239,11 +296,18 @@ class _LivenessItemCardState extends State<LivenessItemCard> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 15,color: Colors.white,),
+            Icon(
+              icon,
+              size: 15,
+              color: Colors.white,
+            ),
             const SizedBox(width: 4),
             Text(
               label,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold,color: Colors.white),
+              style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
             ),
           ],
         ),
